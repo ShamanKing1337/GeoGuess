@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Map</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <style type="text/css">
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    #map{
+      position: absolute;
+      left: 0; top: 15px;
+      height: 90%;
+      width: 94%;
+
+    }
+
+    #pano {
+      position: relative;
+      top: 0;
+      left: 0;
+      height: 90%;
+      width: 54%;
+    }
+
+ 
+
+
+    </style>
+    <!-- <script src ="script.js"></script> -->
+    <script>
+      "use strict";
+
+      var marker
+      var map;
+      var markers;
+      var Lat 
+      var Long
+      Lat = Number(localStorage.getItem("lat"));
+      Long = Number(localStorage.getItem("long"));
+      var Lat1 = Lat
+      var Long1 = Long
+      var LatTry = true
+      let panorama;
+
+      function initMap() {
+        const berkeley = { lat: Lat, lng: Long };
+
+        
+  const sv = new google.maps.StreetViewService();
+  panorama = new google.maps.StreetViewPanorama(
+    document.getElementById("pano")
+  );
+
+  let tmp = sv.getPanorama({ location: berkeley, radius: 50000000 }, processSVData);
+
+
+  
+
+  // button.addEventListener("submit", (e)=>{
+  //   e.preventDefault()
+
+
+  // }
+}
+
+
+function processSVData(data, status) {
+  var location
+  if (status === "OK") {
+    location = data.location;
+    console.log(location.latLng.lat())
+    panorama.setPano(location.pano);
+    panorama.setPov({
+      heading: 270,
+      pitch: 0,
+    });
+    panorama.setVisible(true);
+    Lat = location.latLng.lat()
+    Long = location.latLng.lng()
+  } else {
+    console.error("Street View data not found for this location.");
+  }
+  const button = document.getElementById('elem');
+  
+  button.addEventListener("click", function(){
+    //e.preventDefault()
+      map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: 0, lng : 0 },
+        zoom: 2,
+        //streetViewControl: false,
+        });
+        map.addListener("click", (event) => {
+          if(marker != undefined){
+            marker.setMap(null);
+          }
+          
+          marker = new google.maps.Marker({
+          position: event.latLng,
+          map,
+          });
+
+       });
+
+
+  })
+  const submit = document.getElementById('sub');
+  submit.addEventListener("click", function(){
+      let posLat = marker.position.lat()
+      let posLong = marker.position.lng()
+      let dist = Math.sqrt( Math.pow((Lat - posLat),2) +  Math.pow((Long- posLong),2))
+      alert(5000/dist)
+
+  })
+}
+
+
+
+  </script>
+  </head>
+  <body>
+    <p class="card">
+      <div id="map"></div>
+      <div id="pano"></div>
+      
+    </p>
+    <input type="button" id="elem"  value="Нажми меня">
+    <input type="button" id="sub"  value="Отправить">
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCJsUiEdLMINDLQBlai7qNWYI78jiSKHW8&callback=initMap&libraries=&v=weekly"
+      async
+    ></script>
+  </body>
+</html>
